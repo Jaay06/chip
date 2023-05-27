@@ -4,6 +4,10 @@ import { api } from "~/utils/api";
 import Image from "next/image";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { PageLayout } from "~/components/Layout";
+import { LoadingPage } from "~/components/Loading";
+import { PostView } from "~/components/PostView";
+import { generateSSGHealper } from "~/server/helpers/ssgHelper";
 
 dayjs.extend(relativeTime);
 
@@ -32,8 +36,6 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 
   if (!data) return <div>404</div>;
 
-  console.log(username);
-
   return (
     <>
       <Head>
@@ -60,20 +62,8 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   );
 };
 
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { appRouter } from "~/server/api/root";
-import { prisma } from "~/server/db";
-import superjson from "superjson";
-import { PageLayout } from "~/components/Layout";
-import { LoadingPage } from "~/components/Loading";
-import { PostView } from "~/components/PostView";
-
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
+  const ssg = generateSSGHealper();
 
   const slug = context.params?.slug;
 
